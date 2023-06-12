@@ -18,13 +18,21 @@ public class JoinRepository implements WriteRepository<JoinModel> {
     private static final String CSV = "/output.csv";
 
     private static void writeLines(@NotNull List<JoinModel> lines, File output) {
+        //TODO: You have 3 min to find and fix the bad practices on this method, and develop the TODOs
         try {
+            //TODO: If the output file contains data, it must be deleted, and new data added.
             FileWriter fileWriter = new FileWriter(output, true);
+            //! SEE:    Ask me if you never used the OpenCSV before.
             CSVWriter csvWriter = new CSVWriter(fileWriter);
 
-            String[] header = new String[]{"ID", "NAME", "GENDER", "AGE", "DATE", "COUNTRY", "Company", "Email"};
+            //TODO: Don't forget the header (use the name COUNTRY for the merge key column).
+            String[] header = new String[]{"#ID", "NAME", "GENDER", "AGE", "DATE", "COUNTRY", "Company", "Email"};
             csvWriter.writeNext(header);
-            lines.stream().map(joinModel -> new String[]{String.valueOf(joinModel.getId()), joinModel.getName(), joinModel.getGender(), String.valueOf(joinModel.getAge()), joinModel.getDate(), joinModel.getDate(), joinModel.getCountry(), joinModel.getCompany(), joinModel.getEmail()}).forEach(csvWriter::writeNext);
+
+            //! Without logic issue on this block to write the header and each line
+            lines.stream()
+                    .map(joinModel -> new String[]{String.valueOf(joinModel.getId()), joinModel.getName(), joinModel.getGender(), String.valueOf(joinModel.getAge()), joinModel.getDate(), joinModel.getCountry(), joinModel.getCompany(), joinModel.getEmail()})
+                    .forEach(csvWriter::writeNext);
         } catch (IOException e) {
             throw new CantWriteFileException(e);
         }

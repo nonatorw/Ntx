@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public class JoinModel {
+    private static final String EMPTY = "";
+
     private final int id;
     private final String name;
     private final String gender;
@@ -14,25 +16,30 @@ public class JoinModel {
     private final String company;
     private final String email;
 
+    //! Left table (people) and the corresponding records from the right table (customers)
     public JoinModel(@NotNull PersonModel personModel, CustomerModel customerModel) {
         if (Objects.nonNull(customerModel)) {
+            //  PersonModel copy
             this.id = personModel.getId();
             this.name = personModel.getName();
             this.gender = personModel.getGender();
             this.age = personModel.getAge();
             this.date = personModel.getDate();
+            //  CustomerModel copy
             this.country = customerModel.getCountry();
             this.company = customerModel.getCompany();
             this.email = customerModel.getEmail();
         } else {
+            //  PersonModel copy
             this.id = personModel.getId();
             this.name = personModel.getName();
             this.gender = personModel.getGender();
             this.age = personModel.getAge();
             this.date = personModel.getDate();
-            this.country = "";
-            this.company = "";
-            this.email = "";
+            //  CustomerModel empty
+            this.country = EMPTY;
+            this.company = EMPTY;
+            this.email = EMPTY;
         }
     }
 

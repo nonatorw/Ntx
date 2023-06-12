@@ -19,11 +19,13 @@ public class CustomersLoadRepository implements LoadRepository<CustomerModel> {
     private static final String CSV = "/customers.csv";
 
     private static List<CustomerModel> getCustomerModels(File input) {
+        //TODO: You have 1 min to find and fix the bad practices on this method
         try {
             int skipHeader = 1;
             FileReader fileReader = new FileReader(input);
             CSVReader csvReader = new CSVReaderBuilder(fileReader).withSkipLines(skipHeader).build();
 
+            //! Without logic issue on this return block
             return StreamSupport.stream(csvReader.spliterator(), true).map(strings -> new CustomerModel(strings[4], strings[6], strings[9])).collect(Collectors.toList());
         } catch (IOException e) {
             throw new CantReadFileException(e);

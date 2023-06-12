@@ -19,10 +19,6 @@ public class PersonModel {
         this.country = country;
     }
 
-    public boolean notChild() {
-        return age >= 18;
-    }
-
     public int getId() {
         return id;
     }
