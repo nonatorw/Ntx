@@ -18,13 +18,24 @@ public class JoinRepository implements WriteRepository<JoinModel> {
     private static final String CSV = "/output.csv";
 
     private static void writeLines(@NotNull List<JoinModel> lines, File output) {
-        try {
-            FileWriter fileWriter = new FileWriter(output, true);
-            CSVWriter csvWriter = new CSVWriter(fileWriter);
+        try (FileWriter fileWriter = new FileWriter(output, true);
+             CSVWriter csvWriter = new CSVWriter(fileWriter);) {
 
             String[] header = new String[]{"ID", "NAME", "GENDER", "AGE", "DATE", "COUNTRY", "Company", "Email"};
             csvWriter.writeNext(header);
-            lines.stream().map(joinModel -> new String[]{String.valueOf(joinModel.getId()), joinModel.getName(), joinModel.getGender(), String.valueOf(joinModel.getAge()), joinModel.getDate(), joinModel.getDate(), joinModel.getCountry(), joinModel.getCompany(), joinModel.getEmail()}).forEach(csvWriter::writeNext);
+
+            lines.stream()
+                    .map(joinModel -> new String[] {
+                            String.valueOf(joinModel.getId()),
+                            joinModel.getName(),
+                            joinModel.getGender(),
+                            String.valueOf(joinModel.getAge()),
+                            joinModel.getDate(),
+                            joinModel.getCountry(),
+                            joinModel.getCompany(),
+                            joinModel.getEmail()
+                    })
+                    .forEach(csvWriter::writeNext);
         } catch (IOException e) {
             throw new CantWriteFileException(e);
         }
@@ -33,7 +44,9 @@ public class JoinRepository implements WriteRepository<JoinModel> {
     @Override
     public void save(List<JoinModel> lines) {
         try {
-            File output = Paths.get(Objects.requireNonNull(PeopleLoadRepository.class.getResource(CSV)).toURI()).toFile();
+            File output = Paths.get(Objects.requireNonNull(PeopleLoadRepository.class.getResource(CSV))
+                                                                                     .toURI())
+                               .toFile();
             writeLines(lines, output);
         } catch (URISyntaxException e) {
             throw new CantWriteFileException(e);

@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 public final class PeopleLoadRepository implements LoadRepository<PersonModel> {
@@ -20,11 +21,30 @@ public final class PeopleLoadRepository implements LoadRepository<PersonModel> {
 
     private static List<PersonModel> getCustomerModels(File input) {
         int skipHeader = 1;
-        try {
-            FileReader fileReader = new FileReader(input);
-            CSVReader csvReader = new CSVReaderBuilder(fileReader).withSkipLines(skipHeader).build();
 
-            return StreamSupport.stream(csvReader.spliterator(), true).map(strings -> new PersonModel(Integer.parseInt(strings[0]), strings[1], strings[2], Integer.parseInt(strings[3]), strings[4], strings[5])).collect(Collectors.toList());
+        try (FileReader fileReader = new FileReader(input);
+             CSVReader csvReader = new CSVReaderBuilder(fileReader).withSkipLines(skipHeader).build()) {
+
+            return StreamSupport.stream(csvReader.spliterator(), true)
+                                .distinct()
+                                .filter(strings -> strings.length == 6)
+                                .filter(strings -> IntStream.range(0, 5)
+                                                            .noneMatch(value -> Objects.isNull(strings[value])
+                                                                             || "".equals(strings[value])
+                                                                             || "null".equals(strings[value])))
+                                .map(strings -> {
+                                    try {
+                                        return new PersonModel(Integer.parseInt(strings[0]),
+                                                               strings[1],
+                                                               strings[2],
+                                                               Integer.parseInt(strings[3]),
+                                                               strings[4],
+                                                               strings[5]);
+                                    } catch (Exception e) {
+                                        return null;
+                                    }
+                                })
+                                .filter(Objects::nonNull).collect(Collectors.toList());
         } catch (IOException e) {
             throw new CantReadFileException(e);
         }
